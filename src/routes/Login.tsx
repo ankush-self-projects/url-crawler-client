@@ -3,7 +3,7 @@ import { Container, Typography, TextField, Button, Box } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { login as loginService } from '../services/authService';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -20,11 +20,7 @@ const Login: FC = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post(`${API_URL}/login`, {
-        username,
-        password
-      });
-      const { token: jwtToken } = response.data;
+      const { token: jwtToken } = await loginService(username, password);
       setToken(jwtToken);
       navigate('/dashboard');
     } catch (err) {

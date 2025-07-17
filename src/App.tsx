@@ -1,13 +1,10 @@
 import type { FC, FormEvent, ReactElement } from 'react';
 import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, TextField, Box } from '@mui/material';
-import { useState } from 'react';
 import { useAuth } from './contexts/AuthContext';
-import axios from 'axios';
 import Login from './routes/Login';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Home from './pages/Home';
-import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -41,7 +38,6 @@ const App: FC = () => {
       <Container sx={{ mt: 4 }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
         </Routes>
