@@ -1,14 +1,10 @@
 import { FC } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton, Chip, Tooltip } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton, Chip, Tooltip, TextField, TablePagination, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LinkIcon from '@mui/icons-material/Link';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
-import TitleIcon from '@mui/icons-material/Title';
-import LooksTwoIcon from '@mui/icons-material/LooksTwo';
-import Looks3Icon from '@mui/icons-material/Looks3';
 import LooksOneIcon from '@mui/icons-material/LooksOne';
 import { UrlInfo } from '../services/urlService';
 
@@ -38,36 +34,60 @@ interface UrlTableProps {
   onRequestDelete: () => void;
   onBulkCrawl: () => void;
   isCrawling: boolean;
+  // Pagination and search
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (event: unknown, newPage: number) => void;
+  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  search: string;
+  onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete, onRequestDelete, onBulkCrawl, isCrawling }) => {
-  const allIds = urls.map((row) => row.ID);
+const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete, onRequestDelete, onBulkCrawl, isCrawling, page, rowsPerPage, onPageChange, onRowsPerPageChange, search, onSearchChange }) => {
+  // Filter urls by search
+  const filteredUrls = search
+    ? urls.filter(row => row.URL.toLowerCase().includes(search.toLowerCase()))
+    : urls;
+  // Paginate
+  const paginatedUrls = filteredUrls.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const allIds = paginatedUrls.map((row) => row.ID);
   const allSelected = allIds.length > 0 && allIds.every((id) => selected.includes(id));
   const sortableColumns: ColumnId[] = ['ID', 'URL', 'HTMLVersion', 'Status'];
   return (
     <>
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={selected.length === 0 || isCrawling}
-        onClick={onBulkCrawl}
-        sx={{ mb: 2, alignSelf: 'flex-end', minWidth: 0, p: 1, mr: 1 }}
-        aria-label="Crawl Selected"
-      >
-        <PlayArrowIcon />
-      </Button>
-      <Button
-        variant="contained"
-        color="error"
-        disabled={selected.length === 0}
-        onClick={onRequestDelete}
-        sx={{ mb: 2, alignSelf: 'flex-end', minWidth: 0, p: 1 }}
-        aria-label="Delete Selected"
-      >
-        <DeleteIcon />
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <TextField
+          label="Search URL"
+          value={search}
+          onChange={onSearchChange}
+          size="small"
+          sx={{ width: 300 }}
+        />
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={selected.length === 0 || isCrawling}
+            onClick={onBulkCrawl}
+            sx={{ minWidth: 0, p: 1, mr: 1 }}
+            aria-label="Crawl Selected"
+          >
+            <PlayArrowIcon />
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={selected.length === 0}
+            onClick={onRequestDelete}
+            sx={{ minWidth: 0, p: 1 }}
+            aria-label="Delete Selected"
+          >
+            <DeleteIcon />
+          </Button>
+        </Box>
+      </Box>
       <Paper sx={{ width: '100%', height: 500, maxWidth: '100%', mx: 'auto', mb: 2, display: 'flex', flexDirection: 'column' }}>
-        <TableContainer sx={{ maxHeight: 500, flex: 1, overflowY: 'auto' }}>
+        <TableContainer sx={{ maxHeight: 420, flex: 1, overflowY: 'auto' }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
@@ -108,7 +128,7 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
               </TableRow>
             </TableHead>
             <TableBody>
-              {urls.map((row) => (
+              {paginatedUrls.map((row) => (
                 <TableRow key={row.ID} selected={selected.includes(row.ID)}>
                   <TableCell padding="checkbox">
                     <Checkbox
@@ -212,6 +232,15 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          component="div"
+          count={filteredUrls.length}
+          page={page}
+          onPageChange={onPageChange}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={onRowsPerPageChange}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+        />
       </Paper>
     </>
   );

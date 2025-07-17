@@ -23,11 +23,17 @@ const Dashboard: FC = () => {
   const { token } = useAuth();
   const { urls, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete, handleBulkCrawl, isCrawling, crawlSuccess, crawlError } = useUrls();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (!token) return;
     // The fetchUrls call is now handled by useUrls
   }, [token]);
+
+  // Reset page if search changes
+  useEffect(() => { setPage(0); }, [search]);
 
   if (loading) return <CircularProgress />;
 
@@ -46,6 +52,12 @@ const Dashboard: FC = () => {
         onRequestDelete={() => setConfirmOpen(true)}
         onBulkCrawl={handleBulkCrawl}
         isCrawling={isCrawling}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(_e, newPage) => setPage(newPage)}
+        onRowsPerPageChange={e => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+        search={search}
+        onSearchChange={e => setSearch(e.target.value)}
       />
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
