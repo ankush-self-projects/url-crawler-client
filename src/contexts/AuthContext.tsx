@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { setAuthToken } from '../services/axiosInstance';
 
 interface AuthContextType {
   token: string | null;
@@ -19,7 +20,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.removeItem('token');
     }
     setToken(newToken);
+    setAuthToken(newToken);
   };
+
+  React.useEffect(() => {
+    setAuthToken(token);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ token, setToken: updateToken }}>

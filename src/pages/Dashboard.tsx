@@ -27,7 +27,7 @@ const Dashboard: FC = () => {
 
   useEffect(() => {
     if (!token) return;
-    fetchUrls(token)
+    fetchUrls()
       .then(setUrls)
       .finally(() => setLoading(false));
   }, [token]);

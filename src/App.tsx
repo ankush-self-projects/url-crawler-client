@@ -6,6 +6,7 @@ import Login from './routes/Login';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import AddUrl from './pages/AddUrl';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -25,6 +26,7 @@ const App: FC = () => {
           </Typography>
           <Button color="inherit" component={Link} to="/">Home</Button>
           <Button color="inherit" component={Link} to="/about">About</Button>
+          <Button color="inherit" component={Link} to="/add-url">Add URL</Button>
           {token ? (
             <>
               <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
@@ -40,6 +42,7 @@ const App: FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+          <Route path="/add-url" element={<AddUrl />} />
         </Routes>
       </Container>
     </>

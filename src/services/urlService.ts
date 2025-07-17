@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import axiosInstance from './axiosInstance';
 
 export interface UrlInfo {
   ID: number;
@@ -17,9 +15,12 @@ export interface UrlInfo {
   UpdatedAt: string;
 }
 
-export async function fetchUrls(token: string): Promise<UrlInfo[]> {
-  const response = await axios.get(`${API_URL}/api/urls`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+export async function fetchUrls(): Promise<UrlInfo[]> {
+  const response = await axiosInstance.get('/api/urls');
+  return response.data;
+}
+
+export async function addUrl(url: string): Promise<any> {
+  const response = await axiosInstance.post('/api/urls', { url });
   return response.data;
 } 
