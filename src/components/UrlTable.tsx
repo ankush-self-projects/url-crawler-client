@@ -1,7 +1,15 @@
 import { FC } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton, Chip } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton, Chip, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import LinkIcon from '@mui/icons-material/Link';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+import TitleIcon from '@mui/icons-material/Title';
+import LooksTwoIcon from '@mui/icons-material/LooksTwo';
+import Looks3Icon from '@mui/icons-material/Looks3';
+import LooksOneIcon from '@mui/icons-material/LooksOne';
 import { UrlInfo } from '../services/urlService';
 
 const columns = [
@@ -73,7 +81,15 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
                 {columns.map((col) => (
                   <TableCell
                     key={col.id}
-                    sx={{ fontWeight: 'bold', backgroundColor: 'primary.main', color: 'primary.contrastText' }}
+                    sx={{
+                      fontWeight: 'bold',
+                      backgroundColor: 'primary.main',
+                      color: 'primary.contrastText',
+                      transition: 'color 0.2s',
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
+                    }}
                     sortDirection={orderBy === col.id ? order : false}
                   >
                     {sortableColumns.includes(col.id as ColumnId) ? (
@@ -104,9 +120,81 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
                   <TableCell>{row.URL}</TableCell>
                   <TableCell>{row.HTMLVersion}</TableCell>
                   <TableCell>{row.PageTitle}</TableCell>
-                  <TableCell>{row.Headings}</TableCell>
+                  <TableCell>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Tooltip title="H1" arrow>
+                        <span>
+                          <Chip
+                            label={`<h1> ${parseInt((row.Headings.match(/H1: (\d+)/) || [])[1] || '0', 10)}`}
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                            sx={{ minWidth: 0, fontFamily: 'monospace', borderColor: 'error.main', mr: 1 }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="H2" arrow>
+                        <span>
+                          <Chip
+                            label={`<h2> ${parseInt((row.Headings.match(/H2: (\d+)/) || [])[1] || '0', 10)}`}
+                            size="small"
+                            color="warning"
+                            variant="outlined"
+                            sx={{ minWidth: 0, fontFamily: 'monospace', borderColor: 'warning.main', mr: 1 }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="H3" arrow>
+                        <span>
+                          <Chip
+                            label={`<h3> ${parseInt((row.Headings.match(/H3: (\d+)/) || [])[1] || '0', 10)}`}
+                            size="small"
+                            color="success"
+                            variant="outlined"
+                            sx={{ minWidth: 0, fontFamily: 'monospace', borderColor: 'success.main' }}
+                          />
+                        </span>
+                      </Tooltip>
+                    </span>
+                  </TableCell>
                   <TableCell>{row.HasLoginForm ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>{`${row.InternalLinks} / ${row.ExternalLinks} / ${row.BrokenLinks}`}</TableCell>
+                  <TableCell>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Tooltip title="Internal" arrow>
+                        <span>
+                          <Chip
+                            icon={<LinkIcon fontSize="small" />}
+                            label={row.InternalLinks}
+                            size="small"
+                            color="primary"
+                            sx={{ minWidth: 0 }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="External" arrow>
+                        <span>
+                          <Chip
+                            icon={<OpenInNewIcon fontSize="small" />}
+                            label={row.ExternalLinks}
+                            size="small"
+                            color="info"
+                            sx={{ minWidth: 0 }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Broken" arrow>
+                        <span>
+                          <Chip
+                            icon={<BrokenImageIcon fontSize="small" />}
+                            label={row.BrokenLinks}
+                            size="small"
+                            color="error"
+                            sx={{ minWidth: 0 }}
+                          />
+                        </span>
+                      </Tooltip>
+                    </span>
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={row.Status}
