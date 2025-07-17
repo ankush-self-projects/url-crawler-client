@@ -11,6 +11,12 @@ A modern, TypeScript-based React application for managing and monitoring crawled
 
 ---
 
+## Dashboard Screenshot
+
+![Dashboard Screenshot](public/projects_screen_shot.png)
+
+---
+
 # Getting Started
 
 ## 1. Install Dependencies
