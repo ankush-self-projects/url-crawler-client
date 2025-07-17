@@ -1,12 +1,65 @@
-# React + Vite
+# URL Crawler Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, TypeScript-based React application for managing and monitoring crawled URLs. Features include:
 
-Currently, two official plugins are available:
+- User authentication with JWT
+- Dashboard with sortable, searchable, and paginated URL table
+- Add new URLs for crawling
+- Bulk actions (delete, crawl)
+- Material UI for a clean, responsive interface
+- Comprehensive linting and testing setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+# Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 1. Install Dependencies
+
+```
+npm ci
+```
+
+## 2. Run Locally (Development)
+
+```
+npm run dev
+```
+
+- The app will be available at the URL printed in the terminal (usually http://localhost:5173).
+
+## 3. Lint and Check Code
+
+```
+npm run lint
+```
+
+## 4. Run Tests
+
+```
+npm test
+```
+
+## 5. Build for Production
+
+```
+npm run build
+```
+
+- The production build will be output to the `dist/` directory.
+
+## 6. Preview Production Build Locally
+
+```
+npm run preview
+```
+
+- This serves the `dist/` build locally (default: http://localhost:4173).
+
+## 7. Build and Run with Docker
+
+```
+docker build -t url-crawler-client .
+docker run --rm -p 4173:4173 url-crawler-client
+```
+
+- This will serve your production build at [http://localhost:4173](http://localhost:4173).
