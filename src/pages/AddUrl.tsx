@@ -3,6 +3,7 @@ import { Container, Typography, TextField, Button, Box, Alert } from '@mui/mater
 import { addUrl } from '../services/urlService';
 import { useAuth } from '../contexts/AuthContext';
 import { isValidUrl } from '../utils/validateUrl';
+import axios from 'axios';
 
 const AddUrl: FC = () => {
   const [url, setUrl] = useState('');
@@ -16,7 +17,7 @@ const AddUrl: FC = () => {
     setSuccess('');
     setError('');
     if (!isValidUrl(url)) {
-      setError('Please enter a valid URL (including http:// or https://)');
+      setError('Please enter a valid URL');
       return;
     }
     setLoading(true);
@@ -26,7 +27,11 @@ const AddUrl: FC = () => {
       setSuccess('URL added successfully!');
       setUrl('');
     } catch (err) {
-      setError('Failed to add URL.');
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to add URL.');
+      }
     } finally {
       setLoading(false);
     }

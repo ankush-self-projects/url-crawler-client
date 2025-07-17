@@ -23,4 +23,8 @@ export async function fetchUrls(): Promise<UrlInfo[]> {
 export async function addUrl(url: string): Promise<any> {
   const response = await axiosInstance.post('/api/urls', { url });
   return response.data;
+}
+
+export async function deleteUrls(ids: number[]): Promise<any> {
+  return axiosInstance.delete('/api/urls', { data: { ids } });
 } 

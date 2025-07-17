@@ -5,6 +5,7 @@ import { fetchUrls, UrlInfo } from '../services/urlService';
 import { useAuth } from '../contexts/AuthContext';
 import UrlTable from '../components/UrlTable';
 import type { ColumnId } from '../components/UrlTable';
+import { useUrls } from '../hooks/useUrls';
 
 type Order = 'asc' | 'desc';
 
@@ -20,26 +21,12 @@ function sortRows<T>(rows: T[], orderBy: keyof T, order: Order): T[] {
 
 const Dashboard: FC = () => {
   const { token } = useAuth();
-  const [urls, setUrls] = useState<UrlInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [orderBy, setOrderBy] = useState<ColumnId>('ID');
-  const [order, setOrder] = useState<Order>('asc');
+  const { urls, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete } = useUrls();
 
   useEffect(() => {
     if (!token) return;
-    fetchUrls()
-      .then(setUrls)
-      .finally(() => setLoading(false));
+    // The fetchUrls call is now handled by useUrls
   }, [token]);
-
-  const handleSort = (column: ColumnId) => {
-    if (orderBy === column) {
-      setOrder(order === 'asc' ? 'desc' : 'asc');
-    } else {
-      setOrderBy(column);
-      setOrder('asc');
-    }
-  };
 
   if (loading) return <CircularProgress />;
 
@@ -48,7 +35,16 @@ const Dashboard: FC = () => {
   return (
     <>
       <Typography variant="h4" gutterBottom>Dashboard</Typography>
-      <UrlTable urls={sortedRows} orderBy={orderBy} order={order} onSort={handleSort} />
+      <UrlTable
+        urls={urls}
+        orderBy={orderBy}
+        order={order}
+        onSort={handleSort}
+        selected={selected}
+        onSelect={handleSelect}
+        onSelectAll={handleSelectAll}
+        onBulkDelete={handleBulkDelete}
+      />
     </>
   );
 };

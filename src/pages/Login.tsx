@@ -36,6 +36,9 @@ const Login: FC = () => {
     <Container maxWidth="xs">
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5">Login</Typography>
+        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+          Test credentials: <b>admin</b> / <b>testpassword</b>
+        </Typography>
         <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} required />
         <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
         {error && <Typography color="error">{error}</Typography>}

@@ -1,16 +1,27 @@
 export function isValidUrl(url: string): boolean {
   const trimmed = url.trim();
-  // Accept if it matches a domain pattern (e.g., github.com, www.india.com, react.dev)
-  const domainPattern = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}$/;
-  if (domainPattern.test(trimmed)) return true;
-  // Accept if it's a valid URL with protocol
+
+  // Accept localhost with optional port
+  if (/^localhost(:\d+)?$/.test(trimmed)) return true;
+
+  // Accept domain names with at least one dot and valid TLD (2-24 chars)
+  if (/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,24}$/.test(trimmed)) return true;
+
+  // Try with protocol for the URL constructor, but only accept if hostname has a dot or is localhost
   let testUrl = trimmed;
   if (!/^https?:\/\//i.test(testUrl)) {
     testUrl = 'http://' + testUrl;
   }
   try {
-    new URL(testUrl);
-    return true;
+    const urlObj = new URL(testUrl);
+    const hostname = urlObj.hostname;
+    if (
+      hostname === 'localhost' ||
+      /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,24}$/.test(hostname)
+    ) {
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
