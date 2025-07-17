@@ -4,64 +4,13 @@ import { AppBar, Toolbar, Typography, Button, Container, TextField, Box } from '
 import { useState } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import axios from 'axios';
+import Login from './routes/Login';
+import ProtectedRoute from './routes/ProtectedRoute';
+import Home from './pages/Home';
+import About from './pages/About';
+import Dashboard from './pages/Dashboard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
-const Home: FC = () => <Typography variant="h4">Home Page</Typography>;
-const About: FC = () => <Typography variant="h4">About Page</Typography>;
-
-const Dashboard: FC = () => <Typography variant="h4">Protected Dashboard</Typography>;
-
-const Login: FC = () => {
-  const { setToken, token } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await axios.post(`${API_URL}/login`, {
-        username,
-        password
-      });
-      
-      const { token: jwtToken } = response.data;
-      setToken(jwtToken);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid credentials');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (token) return <Navigate to="/dashboard" replace />;
-
-  return (
-    <Container maxWidth="xs">
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h5">Login</Typography>
-        <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} required />
-        <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-        {error && <Typography color="error">{error}</Typography>}
-        <Button type="submit" variant="contained" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </Button>
-      </Box>
-    </Container>
-  );
-};
-
-const ProtectedRoute: FC<{ element: ReactElement }> = ({ element }) => {
-  const { token } = useAuth();
-  return token ? element : <Navigate to="/login" replace />;
-};
 
 const App: FC = () => {
   const { token, setToken } = useAuth();
