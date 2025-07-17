@@ -2,7 +2,7 @@ import type { FC, FormEvent, ReactElement } from 'react';
 import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, TextField, Box } from '@mui/material';
 import { useAuth } from './contexts/AuthContext';
-import Login from './routes/Login';
+import Login from './pages/Login';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -25,10 +25,9 @@ const App: FC = () => {
             URL Crawler
           </Typography>
           <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/about">About</Button>
-          <Button color="inherit" component={Link} to="/add-url">Add URL</Button>
           {token ? (
             <>
+              <Button color="inherit" component={Link} to="/add-url">Add URL</Button>
               <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
               <Button color="inherit" onClick={handleLogout}>Logout</Button>
             </>
