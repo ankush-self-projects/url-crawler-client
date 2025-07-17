@@ -27,4 +27,8 @@ export async function addUrl(url: string): Promise<any> {
 
 export async function deleteUrls(ids: number[]): Promise<any> {
   return axiosInstance.delete('/api/urls', { data: { ids } });
+}
+
+export async function crawlUrls(ids: number[]): Promise<any> {
+  return axiosInstance.post('/api/urls/crawl', { ids });
 } 

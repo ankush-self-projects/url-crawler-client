@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { fetchUrls, UrlInfo, deleteUrls } from '../services/urlService';
+import { fetchUrls, UrlInfo, deleteUrls, crawlUrls } from '../services/urlService';
+import axios from 'axios';
 
 export type Order = 'asc' | 'desc';
 export type ColumnId =
@@ -30,6 +31,9 @@ export function useUrls() {
   const [orderBy, setOrderBy] = useState<ColumnId>('ID');
   const [order, setOrder] = useState<Order>('asc');
   const [selected, setSelected] = useState<number[]>([]);
+  const [isCrawling, setIsCrawling] = useState(false);
+  const [crawlSuccess, setCrawlSuccess] = useState(false);
+  const [crawlError, setCrawlError] = useState('');
 
   useEffect(() => {
     fetchUrls()
@@ -62,7 +66,27 @@ export function useUrls() {
     setSelected([]);
   }, [selected]);
 
+  const handleBulkCrawl = useCallback(async () => {
+    setIsCrawling(true);
+    setCrawlSuccess(false);
+    setCrawlError('');
+    try {
+      await crawlUrls(selected);
+      setCrawlSuccess(true);
+      setTimeout(() => setCrawlSuccess(false), 2000);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setCrawlError(err.response.data.message);
+      } else {
+        setCrawlError('Failed to run crawl.');
+      }
+      setTimeout(() => setCrawlError(''), 3000);
+    } finally {
+      setIsCrawling(false);
+    }
+  }, [selected]);
+
   const sortedRows = sortRows(urls, orderBy, order);
 
-  return { urls: sortedRows, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete };
+  return { urls: sortedRows, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete, handleBulkCrawl, isCrawling, crawlSuccess, crawlError };
 } 

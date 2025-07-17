@@ -1,5 +1,7 @@
 import { FC } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { UrlInfo } from '../services/urlService';
 
 const columns = [
@@ -27,74 +29,89 @@ interface UrlTableProps {
   onSelect: (id: number) => void;
   onSelectAll: (checked: boolean, allIds: number[]) => void;
   onBulkDelete: () => void;
+  onBulkCrawl: () => void;
+  isCrawling: boolean;
 }
 
-const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete }) => {
+const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete, onBulkCrawl, isCrawling }) => {
   const allIds = urls.map((row) => row.ID);
   const allSelected = allIds.length > 0 && allIds.every((id) => selected.includes(id));
   return (
     <>
       <Button
         variant="contained"
+        color="primary"
+        disabled={selected.length === 0 || isCrawling}
+        onClick={onBulkCrawl}
+        sx={{ mb: 2, alignSelf: 'flex-end', minWidth: 0, p: 1, mr: 1 }}
+        aria-label="Crawl Selected"
+      >
+        <PlayArrowIcon />
+      </Button>
+      <Button
+        variant="contained"
         color="error"
         disabled={selected.length === 0}
         onClick={onBulkDelete}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, alignSelf: 'flex-end', minWidth: 0, p: 1 }}
+        aria-label="Delete Selected"
       >
-        Delete Selected
+        <DeleteIcon />
       </Button>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={allSelected}
-                  indeterminate={selected.length > 0 && !allSelected}
-                  onChange={e => onSelectAll(e.target.checked, allIds)}
-                />
-              </TableCell>
-              {columns.map((col) => (
-                <TableCell
-                  key={col.id}
-                  sx={{ fontWeight: 'bold', backgroundColor: 'primary.main', color: 'primary.contrastText' }}
-                  sortDirection={orderBy === col.id ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === col.id}
-                    direction={orderBy === col.id ? order : 'asc'}
-                    onClick={() => onSort(col.id)}
-                  >
-                    {col.label}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {urls.map((row) => (
-              <TableRow key={row.ID} selected={selected.includes(row.ID)}>
+      <Paper sx={{ width: '100%', height: 500, maxWidth: '100%', mx: 'auto', mb: 2, display: 'flex', flexDirection: 'column' }}>
+        <TableContainer sx={{ maxHeight: 500, flex: 1, overflowY: 'auto' }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selected.includes(row.ID)}
-                    onChange={() => onSelect(row.ID)}
+                    checked={allSelected}
+                    indeterminate={selected.length > 0 && !allSelected}
+                    onChange={e => onSelectAll(e.target.checked, allIds)}
                   />
                 </TableCell>
-                <TableCell>{row.ID}</TableCell>
-                <TableCell>{row.URL}</TableCell>
-                <TableCell>{row.HTMLVersion}</TableCell>
-                <TableCell>{row.PageTitle}</TableCell>
-                <TableCell>{row.Headings}</TableCell>
-                <TableCell>{row.InternalLinks}</TableCell>
-                <TableCell>{row.ExternalLinks}</TableCell>
-                <TableCell>{row.BrokenLinks}</TableCell>
-                <TableCell>{row.HasLoginForm ? 'Yes' : 'No'}</TableCell>
-                <TableCell>{row.Status}</TableCell>
+                {columns.map((col) => (
+                  <TableCell
+                    key={col.id}
+                    sx={{ fontWeight: 'bold', backgroundColor: 'primary.main', color: 'primary.contrastText' }}
+                    sortDirection={orderBy === col.id ? order : false}
+                  >
+                    <TableSortLabel
+                      active={orderBy === col.id}
+                      direction={orderBy === col.id ? order : 'asc'}
+                      onClick={() => onSort(col.id)}
+                    >
+                      {col.label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {urls.map((row) => (
+                <TableRow key={row.ID} selected={selected.includes(row.ID)}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selected.includes(row.ID)}
+                      onChange={() => onSelect(row.ID)}
+                    />
+                  </TableCell>
+                  <TableCell>{row.ID}</TableCell>
+                  <TableCell>{row.URL}</TableCell>
+                  <TableCell>{row.HTMLVersion}</TableCell>
+                  <TableCell>{row.PageTitle}</TableCell>
+                  <TableCell>{row.Headings}</TableCell>
+                  <TableCell>{row.InternalLinks}</TableCell>
+                  <TableCell>{row.ExternalLinks}</TableCell>
+                  <TableCell>{row.BrokenLinks}</TableCell>
+                  <TableCell>{row.HasLoginForm ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>{row.Status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </>
   );
 };

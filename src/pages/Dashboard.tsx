@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
-import { Typography, CircularProgress } from '@mui/material';
+import { Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import { fetchUrls, UrlInfo } from '../services/urlService';
 import { useAuth } from '../contexts/AuthContext';
 import UrlTable from '../components/UrlTable';
@@ -21,7 +21,7 @@ function sortRows<T>(rows: T[], orderBy: keyof T, order: Order): T[] {
 
 const Dashboard: FC = () => {
   const { token } = useAuth();
-  const { urls, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete } = useUrls();
+  const { urls, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete, handleBulkCrawl, isCrawling, crawlSuccess, crawlError } = useUrls();
 
   useEffect(() => {
     if (!token) return;
@@ -44,7 +44,19 @@ const Dashboard: FC = () => {
         onSelect={handleSelect}
         onSelectAll={handleSelectAll}
         onBulkDelete={handleBulkDelete}
+        onBulkCrawl={handleBulkCrawl}
+        isCrawling={isCrawling}
       />
+      <Snackbar open={crawlSuccess} autoHideDuration={2000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Crawl started successfully!
+        </Alert>
+      </Snackbar>
+      <Snackbar open={!!crawlError} autoHideDuration={3000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert severity="error" sx={{ width: '100%' }}>
+          {crawlError}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
