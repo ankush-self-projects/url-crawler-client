@@ -9,16 +9,21 @@ export type ColumnId =
   | 'HTMLVersion'
   | 'PageTitle'
   | 'Headings'
-  | 'InternalLinks'
-  | 'ExternalLinks'
-  | 'BrokenLinks'
   | 'HasLoginForm'
+  | 'Links'
   | 'Status';
 
-function sortRows<T>(rows: T[], orderBy: keyof T, order: Order): T[] {
+function sortRows(rows: UrlInfo[], orderBy: ColumnId, order: Order): UrlInfo[] {
   return [...rows].sort((a, b) => {
-    const aValue = a[orderBy];
-    const bValue = b[orderBy];
+    let aValue: any;
+    let bValue: any;
+    if (orderBy === 'Links') {
+      aValue = a.InternalLinks + a.ExternalLinks + a.BrokenLinks;
+      bValue = b.InternalLinks + b.ExternalLinks + b.BrokenLinks;
+    } else {
+      aValue = a[orderBy as keyof UrlInfo];
+      bValue = b[orderBy as keyof UrlInfo];
+    }
     if (aValue === bValue) return 0;
     if (order === 'asc') return aValue > bValue ? 1 : -1;
     return aValue < bValue ? 1 : -1;

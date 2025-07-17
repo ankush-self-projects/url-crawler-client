@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, Button, IconButton, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { UrlInfo } from '../services/urlService';
@@ -7,13 +7,11 @@ import { UrlInfo } from '../services/urlService';
 const columns = [
   { id: 'ID', label: 'ID' },
   { id: 'URL', label: 'URL' },
-  { id: 'HTMLVersion', label: 'HTML Version' },
+  { id: 'HTMLVersion', label: 'Version' },
   { id: 'PageTitle', label: 'Title' },
   { id: 'Headings', label: 'Headings' },
-  { id: 'InternalLinks', label: 'Internal Links' },
-  { id: 'ExternalLinks', label: 'External Links' },
-  { id: 'BrokenLinks', label: 'Broken Links' },
   { id: 'HasLoginForm', label: 'Login ' },
+  { id: 'Links', label: 'Links' },
   { id: 'Status', label: 'Status' }
 ] as const;
 
@@ -29,13 +27,15 @@ interface UrlTableProps {
   onSelect: (id: number) => void;
   onSelectAll: (checked: boolean, allIds: number[]) => void;
   onBulkDelete: () => void;
+  onRequestDelete: () => void;
   onBulkCrawl: () => void;
   isCrawling: boolean;
 }
 
-const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete, onBulkCrawl, isCrawling }) => {
+const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, onSelect, onSelectAll, onBulkDelete, onRequestDelete, onBulkCrawl, isCrawling }) => {
   const allIds = urls.map((row) => row.ID);
   const allSelected = allIds.length > 0 && allIds.every((id) => selected.includes(id));
+  const sortableColumns: ColumnId[] = ['ID', 'URL', 'HTMLVersion', 'Status'];
   return (
     <>
       <Button
@@ -52,7 +52,7 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
         variant="contained"
         color="error"
         disabled={selected.length === 0}
-        onClick={onBulkDelete}
+        onClick={onRequestDelete}
         sx={{ mb: 2, alignSelf: 'flex-end', minWidth: 0, p: 1 }}
         aria-label="Delete Selected"
       >
@@ -76,13 +76,17 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
                     sx={{ fontWeight: 'bold', backgroundColor: 'primary.main', color: 'primary.contrastText' }}
                     sortDirection={orderBy === col.id ? order : false}
                   >
-                    <TableSortLabel
-                      active={orderBy === col.id}
-                      direction={orderBy === col.id ? order : 'asc'}
-                      onClick={() => onSort(col.id)}
-                    >
-                      {col.label}
-                    </TableSortLabel>
+                    {sortableColumns.includes(col.id as ColumnId) ? (
+                      <TableSortLabel
+                        active={orderBy === col.id}
+                        direction={orderBy === col.id ? order : 'asc'}
+                        onClick={() => onSort(col.id as ColumnId)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    ) : (
+                      col.label
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -101,11 +105,20 @@ const UrlTable: FC<UrlTableProps> = ({ urls, orderBy, order, onSort, selected, o
                   <TableCell>{row.HTMLVersion}</TableCell>
                   <TableCell>{row.PageTitle}</TableCell>
                   <TableCell>{row.Headings}</TableCell>
-                  <TableCell>{row.InternalLinks}</TableCell>
-                  <TableCell>{row.ExternalLinks}</TableCell>
-                  <TableCell>{row.BrokenLinks}</TableCell>
                   <TableCell>{row.HasLoginForm ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>{row.Status}</TableCell>
+                  <TableCell>{`${row.InternalLinks} / ${row.ExternalLinks} / ${row.BrokenLinks}`}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={row.Status}
+                      color={
+                        row.Status === 'done' ? 'success' :
+                        row.Status === 'queued' ? 'warning' :
+                        row.Status === 'error' ? 'error' :
+                        'default'
+                      }
+                      size="small"
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

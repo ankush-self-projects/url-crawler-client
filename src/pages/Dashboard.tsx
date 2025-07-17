@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
-import { Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
+import { Typography, CircularProgress, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { fetchUrls, UrlInfo } from '../services/urlService';
 import { useAuth } from '../contexts/AuthContext';
 import UrlTable from '../components/UrlTable';
@@ -22,6 +22,7 @@ function sortRows<T>(rows: T[], orderBy: keyof T, order: Order): T[] {
 const Dashboard: FC = () => {
   const { token } = useAuth();
   const { urls, loading, orderBy, order, handleSort, selected, handleSelect, handleSelectAll, handleBulkDelete, handleBulkCrawl, isCrawling, crawlSuccess, crawlError } = useUrls();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -29,8 +30,6 @@ const Dashboard: FC = () => {
   }, [token]);
 
   if (loading) return <CircularProgress />;
-
-  const sortedRows = sortRows(urls, orderBy, order);
 
   return (
     <>
@@ -43,10 +42,32 @@ const Dashboard: FC = () => {
         selected={selected}
         onSelect={handleSelect}
         onSelectAll={handleSelectAll}
-        onBulkDelete={handleBulkDelete}
+        onBulkDelete={handleBulkDelete} // keep for direct call, but use onRequestDelete for button
+        onRequestDelete={() => setConfirmOpen(true)}
         onBulkCrawl={handleBulkCrawl}
         isCrawling={isCrawling}
       />
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the selected URLs? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              handleBulkDelete();
+              setConfirmOpen(false);
+            }}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar open={crawlSuccess} autoHideDuration={2000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert severity="success" sx={{ width: '100%' }}>
           Crawl started successfully!
